@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"os/signal"
 	"runtime/debug"
 	"strings"
 	"syscall"
 	"time"
-
-	"bitbucket.org/abotoo/gonohup"
 )
 
 const (
@@ -37,23 +37,8 @@ func main() {
 
 	Configuration = LoadSettings(*optConf)
 
-	ctx := gonohup.Context{
-		Hash:    "godns",
-		User:    Configuration.User,
-		Group:   Configuration.Group,
-		Command: *optCommand,
-	}
-	sig, err := gonohup.Daemonize(ctx)
-	if err != nil {
-		log.Println("Daemonize:", err)
-		return
-	}
-
-	err = gonohup.InitLogger(Configuration.Log_Path, Configuration.Log_Size, Configuration.Log_Num)
-	if err != nil {
-		log.Println("InitLogger error:", err)
-		return
-	}
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGHUP, syscall.SIGUSR2, syscall.SIGTERM)
 
 	go dns_loop()
 
