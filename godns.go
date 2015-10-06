@@ -57,7 +57,7 @@ func dns_loop() {
 	defer func() {
 		if err := recover(); err != nil {
 			panicCount++
-			log.Printf("Recovered in %v: %v\n", err, debug.Stack())
+			log.Printf("Recovered in %v: %s\n", err, string(debug.Stack()))
 			if panicCount < PANIC_MAX {
 				log.Println("Got panic in goroutine, will start a new one... :", panicCount)
 				go dns_loop()
@@ -94,7 +94,7 @@ func dns_loop() {
 			log.Println("Start to update record IP...")
 			update_ip(domain_id, sub_domain_id, Configuration.Sub_domain, currentIP)
 		} else {
-			log.Println("Current IP is same as domain IP, no need to update...")
+			log.Println("Current IP is same with domain IP, no need to update...")
 		}
 
 		//Interval is 5 minutes
